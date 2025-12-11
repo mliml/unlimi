@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.routes import health, auth, onboarding, sessions, users, admin, emo_scores, therapists
+from app.api.routes import health, auth, onboarding, sessions, users, admin, emo_scores, therapists, captcha, invitation
 # from app.api.routes import protected_example  # Uncomment to enable example protected routes
 import logging
 logging.basicConfig(
@@ -23,6 +23,8 @@ app.add_middleware(
 
 app.include_router(health.router)
 app.include_router(auth.router, prefix="/api")
+app.include_router(captcha.router, prefix="/api")
+app.include_router(invitation.router, prefix="/api")
 app.include_router(onboarding.router, prefix="/api/onboarding", tags=["onboarding"])
 app.include_router(users.router, prefix="/api", tags=["users"])
 app.include_router(therapists.router, prefix="/api", tags=["therapists"])

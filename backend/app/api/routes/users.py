@@ -55,6 +55,7 @@ def get_user_overview(
         nickname=current_user.nickname,
         therapist_id=current_user.therapist_id,
         has_finished_onboarding=current_user.has_finished_onboarding,
+        is_admin=current_user.is_admin,
         total_sessions=total_sessions,
         last_session_time=last_session_time,
         next_plan=None

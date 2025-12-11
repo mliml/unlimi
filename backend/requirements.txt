@@ -1,6 +1,7 @@
 fastapi
 uvicorn[standard]
 python-dotenv
+jinja2
 
 # --- Database ---
 sqlalchemy>=2.0
@@ -20,6 +21,7 @@ typing-extensions
 httpx
 PyYAML
 email-validator
+Pillow>=10.0.0
 
 # --- AI Framework ---
 agno

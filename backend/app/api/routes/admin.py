@@ -3,7 +3,7 @@ Admin API Routes
 
 管理后台相关的 API 路由
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from typing import List
 import logging
 import os
@@ -19,6 +19,8 @@ from app.schemas.admin import (
 )
 from app.services.prompt_manager import get_prompt_manager
 from app.core.config import settings
+from app.core.deps import get_current_admin
+from app.db.models.user import User
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +28,7 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 
 
 @router.get("/prompts/files", response_model=FilePromptsResponse)
-async def get_file_prompts():
+async def get_file_prompts(admin: User = Depends(get_current_admin)):
     """
     获取所有文件型提示词配置
 
@@ -65,7 +67,11 @@ async def get_file_prompts():
 
 
 @router.put("/prompts/files/{prompt_key}", response_model=FilePromptUpdateResponse)
-async def update_file_prompt(prompt_key: str, request: FilePromptUpdateRequest):
+async def update_file_prompt(
+    prompt_key: str,
+    request: FilePromptUpdateRequest,
+    admin: User = Depends(get_current_admin)
+):
     """
     更新单个文件型提示词配置
 
@@ -141,7 +147,7 @@ async def update_file_prompt(prompt_key: str, request: FilePromptUpdateRequest):
 
 
 @router.get("/session-config", response_model=SessionConfigResponse)
-async def get_session_config():
+async def get_session_config(admin: User = Depends(get_current_admin)):
     """
     获取 Session 时间和轮数控制配置
 
@@ -163,7 +169,10 @@ async def get_session_config():
 
 
 @router.put("/session-config", response_model=SessionConfigUpdateResponse)
-async def update_session_config(request: SessionConfigUpdateRequest):
+async def update_session_config(
+    request: SessionConfigUpdateRequest,
+    admin: User = Depends(get_current_admin)
+):
     """
     更新 Session 时间和轮数控制配置
 

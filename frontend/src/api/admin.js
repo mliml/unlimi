@@ -89,3 +89,32 @@ export const updateSessionConfig = async (config) => {
   const response = await apiClient.put('/api/admin/session-config', config)
   return response.data
 }
+
+// ============ 邀请码管理 ============
+
+/**
+ * 获取所有邀请码列表
+ * 返回: { codes: [ { id, code, is_universal, is_used, used_by_email, used_at, created_at } ] }
+ */
+export const getInvitationCodes = async () => {
+  const response = await apiClient.get('/api/admin/invitation-codes')
+  return response.data
+}
+
+/**
+ * 生成新的邀请码
+ * 返回: { id, code, is_universal, is_used, used_by_email, used_at, created_at }
+ */
+export const createInvitationCode = async () => {
+  const response = await apiClient.post('/api/admin/invitation-codes')
+  return response.data
+}
+
+/**
+ * 删除邀请码
+ * @param {number} codeId - 邀请码 ID
+ */
+export const deleteInvitationCodeById = async (codeId) => {
+  const response = await apiClient.delete(`/api/admin/invitation-codes/${codeId}`)
+  return response.data
+}

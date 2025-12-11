@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
 
+import LandingPage from '@/pages/LandingPage.vue'
 import LoginPage from '@/pages/LoginPage.vue'
 import RegisterPage from '@/pages/RegisterPage.vue'
 import OnboardingPage from '@/pages/OnboardingPage.vue'
@@ -15,7 +16,9 @@ import AdminPage from '@/pages/AdminPage.vue'
 const routes = [
   {
     path: '/',
-    redirect: '/app/overview'
+    name: 'Landing',
+    component: LandingPage,
+    meta: { isPublic: true }
   },
   {
     path: '/auth/login',
@@ -75,7 +78,7 @@ const routes = [
     path: '/app/admin',
     name: 'Admin',
     component: AdminPage,
-    meta: { requiresAuth: true, requiresOnboarding: true }
+    meta: { requiresAuth: true, requiresOnboarding: true, requiresAdmin: true }
   }
 ]
 
@@ -84,8 +87,16 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
+
+  // Handle authenticated users visiting landing page
+  if (to.path === '/' && authStore.isAuthenticated) {
+    if (!authStore.onboardingCompleted) {
+      return next('/onboarding')
+    }
+    return next('/app/overview')
+  }
 
   if (to.meta.requiresGuest && authStore.isAuthenticated) {
     if (!authStore.onboardingCompleted) {
@@ -104,6 +115,25 @@ router.beforeEach((to, from, next) => {
 
   if (to.path === '/onboarding' && authStore.onboardingCompleted) {
     return next('/app/overview')
+  }
+
+  // 检查是否需要 Admin 权限
+  if (to.meta.requiresAdmin) {
+    // 如果用户信息未加载，先加载
+    if (!authStore.user) {
+      try {
+        await authStore.fetchUserOverview()
+      } catch (err) {
+        console.error('Failed to fetch user overview:', err)
+        return next('/auth/login')
+      }
+    }
+
+    // 检查是否为管理员
+    if (!authStore.user?.is_admin) {
+      console.warn('User is not admin, redirecting to overview')
+      return next('/app/overview')
+    }
   }
 
   next()

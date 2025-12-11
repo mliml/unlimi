@@ -5,6 +5,8 @@ from app.db.database import get_db
 from app.schemas.user import UserCreate, UserLogin, UserPublic
 from app.schemas.auth import TokenResponse
 from app.services.user_service import UserService
+from app.services.captcha_service import CaptchaService
+from app.services.invitation_service import InvitationService
 from app.core.security import create_access_token
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
@@ -16,26 +18,43 @@ def register(
     db: Session = Depends(get_db)
 ):
     """
-    Register a new user.
+    Register a new user with captcha and invitation code verification.
 
     This endpoint:
-    1. Checks if the email is already registered
-    2. Creates a new user with hashed password
-    3. Generates a JWT access token
-    4. Returns the token and user information
+    1. Verifies the captcha
+    2. Verifies the invitation code
+    3. Checks if the email is already registered
+    4. Creates a new user with hashed password
+    5. Marks the invitation code as used
+    6. Generates a JWT access token
+    7. Returns the token and user information
 
     Args:
-        user_data: User registration data (email and password)
+        user_data: User registration data (email, password, invitation_code, captcha)
         db: Database session
 
     Returns:
         TokenResponse containing access_token and user information
 
     Raises:
-        HTTPException 400: If email is already registered
+        HTTPException 400: If captcha/invitation code is invalid or email is already registered
         HTTPException 422: If validation fails
     """
-    # Check if user already exists
+    # 1. Verify captcha
+    if not CaptchaService.verify_captcha(db, user_data.captcha_session_id, user_data.captcha_text):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired captcha"
+        )
+
+    # 2. Verify invitation code
+    if not InvitationService.verify_invitation_code(db, user_data.invitation_code):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or used invitation code"
+        )
+
+    # 3. Check if user already exists
     if UserService.user_exists(db, user_data.email):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -43,13 +62,16 @@ def register(
         )
 
     try:
-        # Create new user
+        # 4. Create new user
         user = UserService.create_user(db, user_data)
 
-        # Generate access token
+        # 5. Mark invitation code as used
+        InvitationService.use_invitation_code(db, user_data.invitation_code, user.id)
+
+        # 6. Generate access token
         access_token = create_access_token(subject=user.email)
 
-        # Convert user to public schema
+        # 7. Convert user to public schema
         user_public = UserPublic.model_validate(user)
 
         return TokenResponse(
@@ -78,24 +100,33 @@ def login(
     db: Session = Depends(get_db)
 ):
     """
-    Authenticate a user and return access token.
+    Authenticate a user and return access token with captcha verification.
 
     This endpoint:
-    1. Validates user credentials (email and password)
-    2. Generates a JWT access token if credentials are valid
-    3. Returns the token and user information
+    1. Verifies the captcha
+    2. Validates user credentials (email and password)
+    3. Generates a JWT access token if credentials are valid
+    4. Returns the token and user information
 
     Args:
-        user_credentials: User login credentials (email and password)
+        user_credentials: User login credentials (email, password, captcha)
         db: Database session
 
     Returns:
         TokenResponse containing access_token and user information
 
     Raises:
+        HTTPException 400: If captcha is invalid
         HTTPException 401: If credentials are invalid
     """
-    # Authenticate user
+    # 1. Verify captcha
+    if not CaptchaService.verify_captcha(db, user_credentials.captcha_session_id, user_credentials.captcha_text):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired captcha"
+        )
+
+    # 2. Authenticate user
     user = UserService.authenticate_user(
         db,
         user_credentials.email,
@@ -109,10 +140,10 @@ def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Generate access token
+    # 3. Generate access token
     access_token = create_access_token(subject=user.email)
 
-    # Convert user to public schema
+    # 4. Convert user to public schema
     user_public = UserPublic.model_validate(user)
 
     return TokenResponse(

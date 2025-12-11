@@ -92,3 +92,31 @@ def get_current_active_user(
     #     raise HTTPException(status_code=400, detail="Inactive user")
 
     return current_user
+
+
+def get_current_admin(
+    current_user: Annotated[User, Depends(get_current_user)]
+) -> User:
+    """
+    Dependency to verify that the current user is an admin.
+
+    Usage:
+        @router.get("/admin-only")
+        def admin_route(admin: User = Depends(get_current_admin)):
+            return {"message": "Admin access granted"}
+
+    Args:
+        current_user: Current authenticated user
+
+    Returns:
+        User object if user is admin
+
+    Raises:
+        HTTPException 403: If user is not an admin
+    """
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required"
+        )
+    return current_user

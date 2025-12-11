@@ -13,6 +13,7 @@ class User(Base):
     nickname = Column(String, nullable=True)
     therapist_id = Column(String, ForeignKey('therapists.id'), nullable=False, default='01')
     has_finished_onboarding = Column(Boolean, default=False, nullable=False)
+    is_admin = Column(Boolean, default=False, nullable=False, index=True)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 

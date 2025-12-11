@@ -48,6 +48,17 @@
                 咨询时间配置
               </button>
               <button
+                @click="activeSidebarTab = 'invitation-codes'"
+                :class="[
+                  'w-full text-left px-4 py-2 rounded-lg transition',
+                  activeSidebarTab === 'invitation-codes'
+                    ? 'bg-primary-600 text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                ]"
+              >
+                邀请码管理
+              </button>
+              <button
                 :class="[
                   'w-full text-left px-4 py-2 rounded-lg transition',
                   'text-gray-700 hover:bg-gray-100 opacity-50 cursor-not-allowed'
@@ -350,6 +361,139 @@
             </div>
           </div>
 
+          <!-- 邀请码管理 Tab -->
+          <div v-else-if="activeSidebarTab === 'invitation-codes'" class="bg-white rounded-lg shadow">
+            <!-- 头部 -->
+            <div class="p-6 border-b border-gray-200">
+              <div class="flex justify-between items-center">
+                <div>
+                  <h2 class="text-lg font-semibold text-gray-800">邀请码管理</h2>
+                  <p class="text-sm text-gray-600 mt-1">生成和管理用户注册邀请码</p>
+                </div>
+                <button
+                  @click="generateInvitationCode"
+                  :disabled="invitationCodesLoading"
+                  class="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  生成新邀请码
+                </button>
+              </div>
+            </div>
+
+            <!-- 成功提示 -->
+            <transition name="fade">
+              <div
+                v-if="invitationCodesSuccess"
+                class="mx-6 mt-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 flex items-center"
+              >
+                <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                {{ invitationCodesSuccess }}
+              </div>
+            </transition>
+
+            <!-- 错误提示 -->
+            <transition name="fade">
+              <div
+                v-if="invitationCodesError"
+                class="mx-6 mt-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 flex items-start"
+              >
+                <svg class="h-5 w-5 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <p class="font-medium">操作失败</p>
+                  <p class="text-sm mt-1">{{ invitationCodesError }}</p>
+                </div>
+              </div>
+            </transition>
+
+            <!-- 加载状态 -->
+            <div v-if="invitationCodesLoading" class="p-12 text-center">
+              <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+              <p class="mt-4 text-gray-600">加载中...</p>
+            </div>
+
+            <!-- 邀请码列表 -->
+            <div v-else class="p-6">
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        邀请码
+                      </th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        状态
+                      </th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        注册账号
+                      </th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        创建时间
+                      </th>
+                      <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        操作
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-for="code in invitationCodes" :key="code.id" class="hover:bg-gray-50">
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center gap-2">
+                          <span class="font-mono text-sm font-medium text-gray-900">{{ code.code }}</span>
+                          <span
+                            v-if="code.is_universal"
+                            class="px-2 py-0.5 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800"
+                          >
+                            万能
+                          </span>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <span
+                          :class="[
+                            'px-2 py-1 text-xs font-medium rounded-full',
+                            code.is_used
+                              ? 'bg-gray-100 text-gray-800'
+                              : 'bg-green-100 text-green-800'
+                          ]"
+                        >
+                          {{ code.is_used ? '已使用' : '未使用' }}
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {{ code.used_by_email || '-' }}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {{ formatDate(code.created_at) }}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button
+                          v-if="!code.is_universal && !code.is_used"
+                          @click="deleteInvitationCode(code.id)"
+                          class="text-red-600 hover:text-red-900 transition"
+                        >
+                          删除
+                        </button>
+                        <span v-else class="text-gray-400">-</span>
+                      </td>
+                    </tr>
+                    <tr v-if="invitationCodes.length === 0">
+                      <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                        暂无邀请码，点击上方按钮生成
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
           <!-- 其他 Tab (占位) -->
           <div v-else class="bg-white rounded-lg shadow p-12 text-center">
             <p class="text-gray-500">该功能即将上线...</p>
@@ -369,7 +513,10 @@ import {
   getTherapist,
   updateTherapistPrompt,
   getSessionConfig,
-  updateSessionConfig
+  updateSessionConfig,
+  getInvitationCodes,
+  createInvitationCode,
+  deleteInvitationCodeById
 } from '@/api/admin'
 
 // ============ Tab 配置 ============
@@ -421,6 +568,12 @@ const sessionConfigLoading = ref(false)
 const sessionConfigSaving = ref(false)
 const sessionConfigSuccess = ref(false)
 const sessionConfigError = ref(null)
+
+// 邀请码管理状态
+const invitationCodes = ref([])
+const invitationCodesLoading = ref(false)
+const invitationCodesSuccess = ref('')
+const invitationCodesError = ref('')
 
 // ============ 计算属性 ============
 
@@ -703,6 +856,101 @@ const saveSessionConfig = async () => {
   }
 }
 
+// ============ 邀请码管理 ============
+
+/**
+ * 加载邀请码列表
+ */
+const loadInvitationCodes = async () => {
+  invitationCodesLoading.value = true
+  invitationCodesError.value = ''
+
+  try {
+    console.log('加载邀请码列表...')
+    const data = await getInvitationCodes()
+    console.log('邀请码列表加载成功:', data)
+    invitationCodes.value = data.codes
+  } catch (err) {
+    console.error('加载邀请码列表失败:', err)
+    invitationCodesError.value = err.response?.data?.detail || err.message || '加载失败'
+  } finally {
+    invitationCodesLoading.value = false
+  }
+}
+
+/**
+ * 生成新邀请码
+ */
+const generateInvitationCode = async () => {
+  invitationCodesError.value = ''
+  invitationCodesSuccess.value = ''
+
+  try {
+    console.log('生成新邀请码...')
+    const newCode = await createInvitationCode()
+    console.log('邀请码生成成功:', newCode)
+
+    invitationCodesSuccess.value = `邀请码 ${newCode.code} 生成成功！`
+
+    // 重新加载列表
+    await loadInvitationCodes()
+
+    // 3秒后隐藏成功提示
+    setTimeout(() => {
+      invitationCodesSuccess.value = ''
+    }, 3000)
+  } catch (err) {
+    console.error('生成邀请码失败:', err)
+    invitationCodesError.value = err.response?.data?.detail || err.message || '生成失败'
+  }
+}
+
+/**
+ * 删除邀请码
+ */
+const deleteInvitationCode = async (codeId) => {
+  if (!confirm('确定要删除这个邀请码吗？')) {
+    return
+  }
+
+  invitationCodesError.value = ''
+  invitationCodesSuccess.value = ''
+
+  try {
+    console.log('删除邀请码:', codeId)
+    await deleteInvitationCodeById(codeId)
+    console.log('邀请码删除成功')
+
+    invitationCodesSuccess.value = '邀请码删除成功！'
+
+    // 重新加载列表
+    await loadInvitationCodes()
+
+    // 3秒后隐藏成功提示
+    setTimeout(() => {
+      invitationCodesSuccess.value = ''
+    }, 3000)
+  } catch (err) {
+    console.error('删除邀请码失败:', err)
+    invitationCodesError.value = err.response?.data?.detail || err.message || '删除失败'
+  }
+}
+
+/**
+ * 格式化日期
+ */
+const formatDate = (dateStr) => {
+  if (!dateStr) return '-'
+  const date = new Date(dateStr)
+  return date.toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
 // ============ 监听器 ============
 
 // 监听侧边栏 Tab 切换
@@ -710,6 +958,9 @@ watch(activeSidebarTab, (newTab) => {
   if (newTab === 'session-config') {
     // 切换到咨询时间配置时加载数据
     loadSessionConfig()
+  } else if (newTab === 'invitation-codes') {
+    // 切换到邀请码管理时加载数据
+    loadInvitationCodes()
   }
 })
 

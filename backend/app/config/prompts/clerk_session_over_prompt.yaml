@@ -21,6 +21,6 @@ system_prompt: |
 # 元数据
 metadata:
   description: "整理咨询会话，提取关键事件"
-  model: "gpt-4o"
+  model: "gpt-5-mini"
   temperature: 0
   version: "1.0.0"

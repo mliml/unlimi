@@ -22,8 +22,8 @@ class Settings(BaseSettings):
     AGNO_DB_URL: Optional[str] = None
 
     # Therapist Agent 配置
-    THERAPIST_MODEL: str = "gpt-4o"
-    THERAPIST_HISTORY_RUNS: int = 100
+    THERAPIST_MODEL: str = "gpt-4o-mini"
+    THERAPIST_HISTORY_RUNS: int = 20
     THERAPIST_ENABLE_MEMORY: bool = True
     THERAPIST_MARKDOWN: bool = False
     THERAPIST_TEMPERATURE: float = 0.7
