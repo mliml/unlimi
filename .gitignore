@@ -1,0 +1,32 @@
+# OS
+.DS_Store
+.claude/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pdb
+*.egg-info/
+*.db
+*.env
+.env.*
+.env
+.venv/
+env/
+venv/
+backend/venv/
+
+# Node / frontend
+node_modules/
+dist/
+build/
+.cache/
+.vite/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Tooling / IDE
+.vscode/
+.idea/
+gitdata/
