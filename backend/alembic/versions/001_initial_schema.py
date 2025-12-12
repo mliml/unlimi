@@ -1,9 +1,10 @@
-"""initial complete schema
+"""initial schema
 
 Revision ID: 001
 Revises:
-Create Date: 2025-12-12 00:00:00.000000
+Create Date: 2025-12-12 16:30:00.000000
 
+Complete database schema matching all model definitions.
 """
 from alembic import op
 import sqlalchemy as sa
@@ -21,8 +22,9 @@ def upgrade() -> None:
     op.create_table('therapists',
         sa.Column('id', sa.String(), nullable=False),
         sa.Column('name', sa.String(), nullable=False),
-        sa.Column('intro', sa.Text(), nullable=False),
-        sa.Column('avatar_url', sa.String(), nullable=True),
+        sa.Column('age', sa.Integer(), nullable=False),
+        sa.Column('info', sa.Text(), nullable=False),
+        sa.Column('prompt', sa.Text(), nullable=False),
         sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
         sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
         sa.PrimaryKeyConstraint('id')
@@ -47,14 +49,31 @@ def upgrade() -> None:
     op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False)
     op.create_index(op.f('ix_users_is_admin'), 'users', ['is_admin'], unique=False)
 
-    # Create user_onboardings table
-    # The questiontype enum will be created automatically by SQLAlchemy
+    # Create sessions table with SessionStatus enum
+    op.create_table('sessions',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('user_id', sa.Integer(), nullable=False),
+        sa.Column('agno_session_id', sa.String(length=255), nullable=True),
+        sa.Column('start_time', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+        sa.Column('end_time', sa.DateTime(), nullable=True),
+        sa.Column('status', sa.Enum('open', 'closed', name='sessionstatus'), nullable=False, server_default='open'),
+        sa.Column('active_duration_seconds', sa.Integer(), nullable=False, server_default='0'),
+        sa.Column('turn_count', sa.Integer(), nullable=False, server_default='0'),
+        sa.Column('overtime_reminder_count', sa.Integer(), nullable=False, server_default='0'),
+        sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
+        sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_sessions_id'), 'sessions', ['id'], unique=False)
+    op.create_index(op.f('ix_sessions_user_id'), 'sessions', ['user_id'], unique=False)
+    op.create_index(op.f('ix_sessions_agno_session_id'), 'sessions', ['agno_session_id'], unique=False)
+
+    # Create user_onboardings table with QuestionType enum
     op.create_table('user_onboardings',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=False),
         sa.Column('question_number', sa.Integer(), nullable=False),
         sa.Column('question_text', sa.Text(), nullable=False),
-        sa.Column('question_type', postgresql.ENUM('choice', 'text', name='questiontype'), nullable=False),
+        sa.Column('question_type', sa.Enum('choice', 'text', name='questiontype'), nullable=False),
         sa.Column('question_options', sa.JSON(), nullable=True),
         sa.Column('answer', sa.Text(), nullable=True),
         sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
@@ -64,47 +83,50 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_user_onboardings_id'), 'user_onboardings', ['id'], unique=False)
     op.create_index(op.f('ix_user_onboardings_user_id'), 'user_onboardings', ['user_id'], unique=False)
-    op.create_index('ix_user_onboardings_user_question', 'user_onboardings', ['user_id', 'question_number'])
 
-    # Create user_context table
-    op.create_table('user_context',
+    # Create user_contexts table (注意：表名是复数)
+    op.create_table('user_contexts',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=False),
-        sa.Column('agno_session_id', sa.String(), nullable=True),
-        sa.Column('context_summary', sa.Text(), nullable=True),
-        sa.Column('last_updated', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-        sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
-        sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_user_context_id'), 'user_context', ['id'], unique=False)
-    op.create_index(op.f('ix_user_context_user_id'), 'user_context', ['user_id'], unique=True)
-
-    # Create sessions table
-    op.create_table('sessions',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('user_id', sa.Integer(), nullable=False),
-        sa.Column('therapist_id', sa.String(), nullable=False),
-        sa.Column('title', sa.String(), nullable=True),
-        sa.Column('mood_before', sa.Integer(), nullable=True),
-        sa.Column('mood_after', sa.Integer(), nullable=True),
-        sa.Column('summary', sa.Text(), nullable=True),
-        sa.Column('key_events', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+        sa.Column('context_text', sa.Text(), nullable=False),
         sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
         sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-        sa.Column('started_at', sa.DateTime(), nullable=True),
-        sa.Column('ended_at', sa.DateTime(), nullable=True),
-        sa.ForeignKeyConstraint(['therapist_id'], ['therapists.id'], ),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_sessions_id'), 'sessions', ['id'], unique=False)
-    op.create_index(op.f('ix_sessions_user_id'), 'sessions', ['user_id'], unique=False)
+    op.create_index(op.f('ix_user_contexts_id'), 'user_contexts', ['id'], unique=False)
+    op.create_index(op.f('ix_user_contexts_user_id'), 'user_contexts', ['user_id'], unique=True)
+
+    # Create user_emo_scores table with EmoScoreSource enum
+    op.create_table('user_emo_scores',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('user_id', sa.Integer(), nullable=False),
+        sa.Column('stress_score', sa.Integer(), nullable=True),
+        sa.Column('stable_score', sa.Integer(), nullable=True),
+        sa.Column('anxiety_score', sa.Integer(), nullable=True),
+        sa.Column('functional_score', sa.Integer(), nullable=True),
+        sa.Column('stress_score_change', sa.Float(), nullable=True),
+        sa.Column('stable_score_change', sa.Float(), nullable=True),
+        sa.Column('anxiety_score_change', sa.Float(), nullable=True),
+        sa.Column('functional_score_change', sa.Float(), nullable=True),
+        sa.Column('source', sa.Enum('onboarding', 'session', name='emoscoresource'), nullable=False),
+        sa.Column('session_id', sa.Integer(), nullable=True),
+        sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+        sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['session_id'], ['sessions.id'], ondelete='SET NULL'),
+        sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_user_emo_scores_id'), 'user_emo_scores', ['id'], unique=False)
+    op.create_index(op.f('ix_user_emo_scores_user_id'), 'user_emo_scores', ['user_id'], unique=False)
+    op.create_index(op.f('ix_user_emo_scores_source'), 'user_emo_scores', ['source'], unique=False)
+    op.create_index(op.f('ix_user_emo_scores_session_id'), 'user_emo_scores', ['session_id'], unique=False)
+    op.create_index(op.f('ix_user_emo_scores_created_at'), 'user_emo_scores', ['created_at'], unique=False)
 
     # Create session_plans table
     op.create_table('session_plans',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('session_id', sa.Integer(), nullable=False),
-        sa.Column('plan_content', sa.Text(), nullable=True),
+        sa.Column('plan_text', sa.Text(), nullable=False),
         sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
         sa.ForeignKeyConstraint(['session_id'], ['sessions.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
@@ -112,13 +134,13 @@ def upgrade() -> None:
     op.create_index(op.f('ix_session_plans_id'), 'session_plans', ['id'], unique=False)
     op.create_index(op.f('ix_session_plans_session_id'), 'session_plans', ['session_id'], unique=True)
 
-    # Create session_messages table
+    # Create session_messages table with MessageSender enum
     op.create_table('session_messages',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('session_id', sa.Integer(), nullable=False),
-        sa.Column('role', sa.String(), nullable=False),
-        sa.Column('content', sa.Text(), nullable=False),
-        sa.Column('timestamp', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+        sa.Column('sender', sa.Enum('user', 'therapist', 'system', name='messagesender'), nullable=False),
+        sa.Column('message', sa.Text(), nullable=False),
+        sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
         sa.ForeignKeyConstraint(['session_id'], ['sessions.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
@@ -129,25 +151,14 @@ def upgrade() -> None:
     op.create_table('session_reviews',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('session_id', sa.Integer(), nullable=False),
-        sa.Column('review_content', sa.Text(), nullable=True),
+        sa.Column('message_review', sa.Text(), nullable=False),
+        sa.Column('key_events', sa.JSON(), nullable=True),
         sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
         sa.ForeignKeyConstraint(['session_id'], ['sessions.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_session_reviews_id'), 'session_reviews', ['id'], unique=False)
     op.create_index(op.f('ix_session_reviews_session_id'), 'session_reviews', ['session_id'], unique=True)
-
-    # Create user_emo_scores table
-    op.create_table('user_emo_scores',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('user_id', sa.Integer(), nullable=False),
-        sa.Column('emo_score_json', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-        sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-        sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
-        sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_user_emo_scores_id'), 'user_emo_scores', ['id'], unique=False)
-    op.create_index(op.f('ix_user_emo_scores_user_id'), 'user_emo_scores', ['user_id'], unique=False)
 
     # Create captcha_sessions table
     op.create_table('captcha_sessions',
@@ -164,29 +175,29 @@ def upgrade() -> None:
     # Create invitation_codes table
     op.create_table('invitation_codes',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('code', sa.String(), nullable=False),
+        sa.Column('code', sa.String(length=20), nullable=False),
+        sa.Column('is_universal', sa.Boolean(), nullable=False, server_default='false'),
         sa.Column('is_used', sa.Boolean(), nullable=False, server_default='false'),
-        sa.Column('used_by_email', sa.String(), nullable=True),
-        sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+        sa.Column('used_by_user_id', sa.Integer(), nullable=True),
         sa.Column('used_at', sa.DateTime(), nullable=True),
+        sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+        sa.ForeignKeyConstraint(['used_by_user_id'], ['users.id'], ondelete='SET NULL'),
         sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_invitation_codes_code'), 'invitation_codes', ['code'], unique=True)
     op.create_index(op.f('ix_invitation_codes_id'), 'invitation_codes', ['id'], unique=False)
+    op.create_index(op.f('ix_invitation_codes_code'), 'invitation_codes', ['code'], unique=True)
+    op.create_index(op.f('ix_invitation_codes_is_used'), 'invitation_codes', ['is_used'], unique=False)
 
 
 def downgrade() -> None:
-    op.drop_index(op.f('ix_invitation_codes_id'), table_name='invitation_codes')
+    op.drop_index(op.f('ix_invitation_codes_is_used'), table_name='invitation_codes')
     op.drop_index(op.f('ix_invitation_codes_code'), table_name='invitation_codes')
+    op.drop_index(op.f('ix_invitation_codes_id'), table_name='invitation_codes')
     op.drop_table('invitation_codes')
 
     op.drop_index(op.f('ix_captcha_sessions_session_id'), table_name='captcha_sessions')
     op.drop_index(op.f('ix_captcha_sessions_id'), table_name='captcha_sessions')
     op.drop_table('captcha_sessions')
-
-    op.drop_index(op.f('ix_user_emo_scores_user_id'), table_name='user_emo_scores')
-    op.drop_index(op.f('ix_user_emo_scores_id'), table_name='user_emo_scores')
-    op.drop_table('user_emo_scores')
 
     op.drop_index(op.f('ix_session_reviews_session_id'), table_name='session_reviews')
     op.drop_index(op.f('ix_session_reviews_id'), table_name='session_reviews')
@@ -200,20 +211,25 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_session_plans_id'), table_name='session_plans')
     op.drop_table('session_plans')
 
-    op.drop_index(op.f('ix_sessions_user_id'), table_name='sessions')
-    op.drop_index(op.f('ix_sessions_id'), table_name='sessions')
-    op.drop_table('sessions')
+    op.drop_index(op.f('ix_user_emo_scores_created_at'), table_name='user_emo_scores')
+    op.drop_index(op.f('ix_user_emo_scores_session_id'), table_name='user_emo_scores')
+    op.drop_index(op.f('ix_user_emo_scores_source'), table_name='user_emo_scores')
+    op.drop_index(op.f('ix_user_emo_scores_user_id'), table_name='user_emo_scores')
+    op.drop_index(op.f('ix_user_emo_scores_id'), table_name='user_emo_scores')
+    op.drop_table('user_emo_scores')
 
-    op.drop_index(op.f('ix_user_context_user_id'), table_name='user_context')
-    op.drop_index(op.f('ix_user_context_id'), table_name='user_context')
-    op.drop_table('user_context')
+    op.drop_index(op.f('ix_user_contexts_user_id'), table_name='user_contexts')
+    op.drop_index(op.f('ix_user_contexts_id'), table_name='user_contexts')
+    op.drop_table('user_contexts')
 
-    op.drop_index('ix_user_onboardings_user_question', table_name='user_onboardings')
     op.drop_index(op.f('ix_user_onboardings_user_id'), table_name='user_onboardings')
     op.drop_index(op.f('ix_user_onboardings_id'), table_name='user_onboardings')
     op.drop_table('user_onboardings')
 
-    postgresql.ENUM(name='questiontype').drop(op.get_bind(), checkfirst=True)
+    op.drop_index(op.f('ix_sessions_agno_session_id'), table_name='sessions')
+    op.drop_index(op.f('ix_sessions_user_id'), table_name='sessions')
+    op.drop_index(op.f('ix_sessions_id'), table_name='sessions')
+    op.drop_table('sessions')
 
     op.drop_index(op.f('ix_users_is_admin'), table_name='users')
     op.drop_index(op.f('ix_users_id'), table_name='users')
@@ -222,3 +238,9 @@ def downgrade() -> None:
 
     op.drop_index(op.f('ix_therapists_id'), table_name='therapists')
     op.drop_table('therapists')
+
+    # Drop enums
+    sa.Enum(name='messagesender').drop(op.get_bind(), checkfirst=True)
+    sa.Enum(name='emoscoresource').drop(op.get_bind(), checkfirst=True)
+    sa.Enum(name='questiontype').drop(op.get_bind(), checkfirst=True)
+    sa.Enum(name='sessionstatus').drop(op.get_bind(), checkfirst=True)
