@@ -151,14 +151,15 @@ def upgrade() -> None:
 
     # Create captcha_sessions table
     op.create_table('captcha_sessions',
-        sa.Column('id', sa.String(), nullable=False),
-        sa.Column('question', sa.String(), nullable=False),
-        sa.Column('answer', sa.String(), nullable=False),
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('session_id', sa.String(length=64), nullable=False),
+        sa.Column('captcha_text', sa.String(length=4), nullable=False),
         sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
         sa.Column('expires_at', sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_captcha_sessions_id'), 'captcha_sessions', ['id'], unique=False)
+    op.create_index(op.f('ix_captcha_sessions_session_id'), 'captcha_sessions', ['session_id'], unique=True)
 
     # Create invitation_codes table
     op.create_table('invitation_codes',
@@ -179,6 +180,7 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_invitation_codes_code'), table_name='invitation_codes')
     op.drop_table('invitation_codes')
 
+    op.drop_index(op.f('ix_captcha_sessions_session_id'), table_name='captcha_sessions')
     op.drop_index(op.f('ix_captcha_sessions_id'), table_name='captcha_sessions')
     op.drop_table('captcha_sessions')
 
