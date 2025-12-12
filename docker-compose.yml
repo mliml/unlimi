@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    container_name: unlimi-db
+    environment:
+      POSTGRES_DB: unlimi
+      POSTGRES_USER: unlimi_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - unlimi-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U unlimi_user -d unlimi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: unlimi-backend
+    environment:
+      DATABASE_URL: postgresql://unlimi_user:${DB_PASSWORD}@postgres:5432/unlimi
+      SECRET_KEY: ${SECRET_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      AGNO_DB_URL: postgresql://unlimi_user:${DB_PASSWORD}@postgres:5432/unlimi
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - unlimi-network
+    restart: unless-stopped
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+    container_name: unlimi-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - unlimi-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  unlimi-network:
+    driver: bridge
