@@ -1,35 +1,56 @@
 #!/bin/bash
 
-echo "=== UnLimi Deployment Script ==="
+echo "=== UnLimi Deploy Script (Preserve Data) ==="
+echo ""
 
-# Check if .env exists
+# Verify .env file exists
 if [ ! -f .env ]; then
-    echo "Error: .env file not found!"
-    echo "Please copy .env.example to .env and fill in your values."
+    echo "❌ Error: .env file not found!"
+    echo "Please copy .env.example to .env and configure it."
     exit 1
 fi
 
 # Pull latest code
-echo "Pulling latest code..."
+echo "1/6 Pulling latest code from GitHub..."
 git pull origin main
 
-# Build and start containers
-echo "Building and starting containers..."
+# Verify configuration
+echo "2/6 Verifying configuration..."
+docker compose run --rm backend python verify_config.py
+if [ $? -ne 0 ]; then
+    echo "❌ Configuration verification failed! Please check your .env file."
+    exit 1
+fi
+
+# Rebuild backend (no cache to ensure latest code)
+echo "3/6 Rebuilding backend Docker image..."
+docker compose build --no-cache backend
+
+# Rebuild frontend
+echo "4/6 Rebuilding frontend Docker image..."
+docker compose build --no-cache frontend
+
+# Restart all services
+echo "5/6 Restarting all services..."
 docker compose down
-docker compose build --no-cache
 docker compose up -d
 
 # Wait for services to start
-echo "Waiting for services to start..."
-sleep 10
+echo "6/6 Waiting for services to start..."
+sleep 20
 
-# Check service status
-echo "Checking service status..."
+# Show status
+echo ""
+echo "=== Deployment Status ==="
 docker compose ps
+
+echo ""
+echo "=== Backend Logs (last 15 lines) ==="
+docker compose logs backend --tail 15
 
 echo ""
 echo "=== Deployment Complete ==="
 echo "Access your application at: http://$(curl -s ifconfig.me)"
 echo ""
-echo "To view logs: docker compose logs -f"
-echo "To stop: docker compose down"
+echo "To view real-time logs: docker compose logs -f"
+echo "To stop all services: docker compose down"
