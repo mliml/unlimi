@@ -15,9 +15,9 @@ git pull origin main
 
 # Build and start containers
 echo "Building and starting containers..."
-docker-compose down
-docker-compose build --no-cache
-docker-compose up -d
+docker compose down
+docker compose build --no-cache
+docker compose up -d
 
 # Wait for services to start
 echo "Waiting for services to start..."
@@ -25,11 +25,11 @@ sleep 10
 
 # Check service status
 echo "Checking service status..."
-docker-compose ps
+docker compose ps
 
 echo ""
 echo "=== Deployment Complete ==="
 echo "Access your application at: http://$(curl -s ifconfig.me)"
 echo ""
-echo "To view logs: docker-compose logs -f"
-echo "To stop: docker-compose down"
+echo "To view logs: docker compose logs -f"
+echo "To stop: docker compose down"
