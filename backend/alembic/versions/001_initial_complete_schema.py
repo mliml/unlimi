@@ -47,17 +47,14 @@ def upgrade() -> None:
     op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False)
     op.create_index(op.f('ix_users_is_admin'), 'users', ['is_admin'], unique=False)
 
-    # Create enum types
-    questiontype_enum = postgresql.ENUM('choice', 'text', name='questiontype', create_type=False)
-    questiontype_enum.create(op.get_bind(), checkfirst=True)
-
     # Create user_onboardings table
+    # The questiontype enum will be created automatically by SQLAlchemy
     op.create_table('user_onboardings',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=False),
         sa.Column('question_number', sa.Integer(), nullable=False),
         sa.Column('question_text', sa.Text(), nullable=False),
-        sa.Column('question_type', sa.Enum('choice', 'text', name='questiontype', create_type=False), nullable=False),
+        sa.Column('question_type', postgresql.ENUM('choice', 'text', name='questiontype'), nullable=False),
         sa.Column('question_options', sa.JSON(), nullable=True),
         sa.Column('answer', sa.Text(), nullable=True),
         sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
