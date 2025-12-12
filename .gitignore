@@ -30,3 +30,6 @@ pnpm-debug.log*
 .vscode/
 .idea/
 gitdata/
+
+# SSL Certificates (contains private keys)
+certbot/
