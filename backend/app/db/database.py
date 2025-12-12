@@ -2,8 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from typing import Generator
+import os
 
-DATABASE_URL = "postgresql://ai_user:password@localhost/ai_therapy"
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://ai_user:password@localhost/ai_therapy")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
