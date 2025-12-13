@@ -1,16 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/features/auth/store/auth'
 
-import LoginPage from '@/features/auth/pages/LoginPage.vue'
-import RegisterPage from '@/features/auth/pages/RegisterPage.vue'
-import OnboardingPage from '@/features/onboarding/pages/OnboardingPage.vue'
-import OverviewPage from '@/features/overview/pages/OverviewPage.vue'
-import OverviewPageNew from '@/features/overview/pages/OverviewPageNew.vue'
-import ConsultPage from '@/features/consult/pages/ConsultPage.vue'
-import HistoryPage from '@/features/history/pages/HistoryPage.vue'
-import InsightsPage from '@/features/insights/pages/InsightsPage.vue'
-import SettingsPage from '@/features/settings/pages/SettingsPage.vue'
-import AdminPage from '@/features/admin/pages/AdminPage.vue'
+// Lazy load all pages for better performance
+const LoginPage = () => import('@/features/auth/pages/LoginPage.vue')
+const RegisterPage = () => import('@/features/auth/pages/RegisterPage.vue')
+const OnboardingPage = () => import('@/features/onboarding/pages/OnboardingPage.vue')
+const OverviewPage = () => import('@/features/overview/pages/OverviewPage.vue')
+const OverviewPageNew = () => import('@/features/overview/pages/OverviewPageNew.vue')
+const ConsultPage = () => import('@/features/consult/pages/ConsultPage.vue')
+const HistoryPage = () => import('@/features/history/pages/HistoryPage.vue')
+const InsightsPage = () => import('@/features/insights/pages/InsightsPage.vue')
+const SettingsPage = () => import('@/features/settings/pages/SettingsPage.vue')
+const AdminPage = () => import('@/features/admin/pages/AdminPage.vue')
 
 const routes = [
   {
