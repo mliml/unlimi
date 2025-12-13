@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, Text, DateTime, ForeignKey, Enum as SQLE
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 import enum
-from app.db.database import Base
+from app.services.database import Base
 
 
 class MessageSender(str, enum.Enum):

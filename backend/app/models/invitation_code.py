@@ -8,7 +8,7 @@ Supports both single-use codes and universal codes.
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from app.db.database import Base
+from app.services.database import Base
 
 
 class InvitationCode(Base):

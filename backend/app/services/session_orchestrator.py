@@ -4,7 +4,7 @@ from typing import Dict, Optional
 from app.agents.therapist_agent_service import TherapistAgentService
 from app.agents.clerk_agent_service import ClerkAgentService
 from app.agents.intent_classifier import IntentClassifier  # 保留但暂时不使用
-from app.db.models.session import Session as SessionModel
+from app.models.session import Session as SessionModel
 
 logger = logging.getLogger(__name__)
 

@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import Optional, List
-from app.db.models.session import SessionStatus
+from app.models.session import SessionStatus
 
 
 class SessionCreate(BaseModel):

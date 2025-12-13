@@ -7,7 +7,7 @@ API endpoints for captcha generation and verification.
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.db.database import get_db
+from app.services.database import get_db
 from app.schemas.captcha import CaptchaResponse
 from app.services.captcha_service import CaptchaService
 

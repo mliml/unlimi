@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import Annotated
-from app.db.database import get_db
-from app.db.models.user import User
-from app.db.models.user_onboarding import UserOnboarding
-from app.db.models.emo_score import EmoScore, EmoScoreSource
-from app.db.models.user_context import UserContext
+from app.services.database import get_db
+from app.models.user import User
+from app.models.user_onboarding import UserOnboarding
+from app.models.emo_score import EmoScore, EmoScoreSource
+from app.models.user_context import UserContext
 from app.core.deps import get_current_user
 from app.schemas.onboarding import (
     OnboardingStateResponse,

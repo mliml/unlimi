@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session as DBSession
 from typing import List
-from app.db.database import get_db
+from app.services.database import get_db
 from app.core.deps import get_current_user
-from app.db.models.user import User
-from app.db.models.therapist import Therapist
+from app.models.user import User
+from app.models.therapist import Therapist
 from app.schemas.therapist import TherapistRead, TherapistUpdate, TherapistListItem
 
 router = APIRouter(prefix="/therapists", tags=["therapists"])

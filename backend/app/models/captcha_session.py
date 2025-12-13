@@ -7,7 +7,7 @@ Stores captcha text and expiration for one-time verification.
 
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.sql import func
-from app.db.database import Base
+from app.services.database import Base
 
 
 class CaptchaSession(Base):

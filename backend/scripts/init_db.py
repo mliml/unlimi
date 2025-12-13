@@ -12,9 +12,9 @@ from sqlalchemy.orm import Session
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from app.db.database import SessionLocal
-from app.db.models.therapist import Therapist
-from app.db.models.invitation_code import InvitationCode
+from app.services.database import SessionLocal
+from app.models.therapist import Therapist
+from app.models.invitation_code import InvitationCode
 
 
 def init_therapists(db: Session):

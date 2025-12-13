@@ -2,11 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session as DBSession
 from typing import Optional
 
-from app.db.database import get_db
+from app.services.database import get_db
 from app.core.deps import get_current_user
-from app.db.models.user import User
-from app.db.models.session import Session
-from app.db.models.emo_score import EmoScoreSource
+from app.models.user import User
+from app.models.session import Session
+from app.models.emo_score import EmoScoreSource
 from app.schemas.emo_score import (
     EmoScoreCreate,
     EmoScoreResponse,

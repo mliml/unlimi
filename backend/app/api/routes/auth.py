@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 import logging
-from app.db.database import get_db
+from app.services.database import get_db
 from app.schemas.user import UserCreate, UserLogin, UserPublic
 from app.schemas.auth import TokenResponse
 from app.services.user_service import UserService

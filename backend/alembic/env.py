@@ -8,8 +8,8 @@ from os.path import dirname, abspath
 
 sys.path.insert(0, dirname(dirname(abspath(__file__))))
 
-from app.db.database import Base
-from app.db.models import (
+from app.services.database import Base
+from app.models import (
     User,
     Session,
     SessionPlan,

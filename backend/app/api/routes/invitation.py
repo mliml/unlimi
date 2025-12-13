@@ -7,10 +7,10 @@ API endpoints for invitation code management (Admin only).
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.db.database import get_db
+from app.services.database import get_db
 from app.core.deps import get_current_admin
-from app.db.models.user import User
-from app.db.models.invitation_code import InvitationCode
+from app.models.user import User
+from app.models.invitation_code import InvitationCode
 from app.schemas.invitation import InvitationCodeResponse, InvitationCodeListResponse
 from app.services.invitation_service import InvitationService
 

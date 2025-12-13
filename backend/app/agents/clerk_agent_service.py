@@ -8,8 +8,8 @@ from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 from agno.run import RunContext
 from app.core.config import settings
-from app.db.models.user_context import UserContext
-from app.db.models.session_review import SessionReview
+from app.models.user_context import UserContext
+from app.models.session_review import SessionReview
 from sqlalchemy.orm import Session
 from typing import Optional, Dict, List
 from datetime import datetime
@@ -93,7 +93,7 @@ class ClerkAgentService:
         """
         try:
             # 1. 读取用户所有 onboarding 问答
-            from app.db.models.user_onboarding import UserOnboarding
+            from app.models.user_onboarding import UserOnboarding
 
             questions = db.query(UserOnboarding)\
                 .filter_by(user_id=user_id)\
@@ -264,7 +264,7 @@ class ClerkAgentService:
             Args:
                 context_markdown: Markdown 格式的用户上下文
             """
-            from app.db.database import SessionLocal
+            from app.services.database import SessionLocal
 
             user_id = run_context.session_state.get("user_id")
 
@@ -311,7 +311,7 @@ class ClerkAgentService:
             Args:
                 new_context_markdown: 新的用户上下文（完整替换）
             """
-            from app.db.database import SessionLocal
+            from app.services.database import SessionLocal
 
             user_id = run_context.session_state.get("user_id")
 
@@ -357,7 +357,7 @@ class ClerkAgentService:
                 session_review: 会话总结文本
                 key_events: 关键事件列表（字符串数组）
             """
-            from app.db.database import SessionLocal
+            from app.services.database import SessionLocal
 
             session_id = run_context.session_state.get("session_id")
 

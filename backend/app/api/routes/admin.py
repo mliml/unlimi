@@ -20,7 +20,7 @@ from app.schemas.admin import (
 from app.services.prompt_manager import get_prompt_manager
 from app.core.config import settings
 from app.core.deps import get_current_admin
-from app.db.models.user import User
+from app.models.user import User
 
 logger = logging.getLogger(__name__)
 

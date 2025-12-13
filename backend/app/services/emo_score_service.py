@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
-from app.db.models.emo_score import EmoScore, EmoScoreSource
+from app.models.emo_score import EmoScore, EmoScoreSource
 from typing import Optional
 
 

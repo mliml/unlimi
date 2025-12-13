@@ -3,14 +3,14 @@ from sqlalchemy.orm import Session as DBSession
 from sqlalchemy import func, desc, text
 from typing import List
 from datetime import datetime, timedelta
-from app.db.database import get_db
+from app.services.database import get_db
 from app.core.deps import get_current_user
-from app.db.models.user import User
-from app.db.models.session import Session, SessionStatus
+from app.models.user import User
+from app.models.session import Session, SessionStatus
 from app.schemas.session_action import SessionStartResponse, SessionEndResponse, ActiveSessionResponse
 from app.schemas.session_message import SessionMessageRequest, SessionMessageResponse, SessionMessageListItem
 from app.schemas.session import SessionDetail, SessionHistoryItem
-from app.orchestrator.session_orchestrator import SessionOrchestrator
+from app.services.session_orchestrator import SessionOrchestrator
 from app.agents.therapist_agent_service import TherapistAgentService
 import logging
 

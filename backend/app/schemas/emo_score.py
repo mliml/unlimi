@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 from typing import Optional
-from app.db.models.emo_score import EmoScoreSource
+from app.models.emo_score import EmoScoreSource
 
 
 class EmoScoreCreate(BaseModel):

@@ -14,7 +14,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from sqlalchemy.orm import Session
 from typing import Tuple
 
-from app.db.models.captcha_session import CaptchaSession
+from app.models.captcha_session import CaptchaSession
 
 
 class CaptchaService:

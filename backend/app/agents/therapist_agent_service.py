@@ -9,7 +9,7 @@ from agno.db.postgres import PostgresDb
 from agno.db.sqlite import SqliteDb
 from agno.models.openai import OpenAIChat
 from app.core.config import settings
-from app.db.models.user_context import UserContext
+from app.models.user_context import UserContext
 from sqlalchemy.orm import Session
 from typing import Optional, List, Dict, Tuple
 from datetime import datetime, timedelta
@@ -127,7 +127,7 @@ class TherapistAgentService:
             therapist_prompt = self._load_therapist_prompt(user_id, db)
 
             # 3. 获取 session 对象并更新轮数
-            from app.db.models.session import Session as SessionModel
+            from app.models.session import Session as SessionModel
             session_obj = db.query(SessionModel).filter_by(agno_session_id=session_id).first()
 
             if session_obj:
@@ -320,8 +320,8 @@ class TherapistAgentService:
             治疗师的个性化 prompt 文本
         """
         try:
-            from app.db.models.user import User
-            from app.db.models.therapist import Therapist
+            from app.models.user import User
+            from app.models.therapist import Therapist
             from sqlalchemy.orm import joinedload
 
             # 查询用户及其关联的治疗师（使用 joinedload 优化）

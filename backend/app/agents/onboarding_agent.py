@@ -11,10 +11,10 @@ from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 from agno.run import RunContext
 from app.core.config import settings
-from app.db.models.user import User
-from app.db.models.user_onboarding import UserOnboarding, QuestionType
-from app.db.models.user_context import UserContext
-from app.db.models.emo_score import EmoScore, EmoScoreSource
+from app.models.user import User
+from app.models.user_onboarding import UserOnboarding, QuestionType
+from app.models.user_context import UserContext
+from app.models.emo_score import EmoScore, EmoScoreSource
 from sqlalchemy.orm import Session
 from typing import Optional, List
 from datetime import datetime
@@ -102,7 +102,7 @@ class OnboardingAgentService:
                 return "错误：缺少用户ID"
 
             # 重新获取 db session（避免 pickle 问题）
-            from app.db.database import SessionLocal
+            from app.services.database import SessionLocal
             db = SessionLocal()
 
             try:
@@ -172,7 +172,7 @@ class OnboardingAgentService:
                 return "错误：缺少用户ID"
 
             # 重新获取 db session（避免 pickle 问题）
-            from app.db.database import SessionLocal
+            from app.services.database import SessionLocal
             db = SessionLocal()
 
             try:
@@ -252,7 +252,7 @@ class OnboardingAgentService:
                 return "错误：缺少用户ID"
 
             # 重新获取 db session（避免 pickle 问题）
-            from app.db.database import SessionLocal
+            from app.services.database import SessionLocal
             db = SessionLocal()
 
             try:
@@ -307,7 +307,7 @@ class OnboardingAgentService:
                 return "错误：缺少用户ID"
 
             # 重新获取 db session（避免 pickle 问题）
-            from app.db.database import SessionLocal
+            from app.services.database import SessionLocal
             db = SessionLocal()
 
             try:

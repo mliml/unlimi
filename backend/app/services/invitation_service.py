@@ -10,7 +10,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 from typing import List
 
-from app.db.models.invitation_code import InvitationCode
+from app.models.invitation_code import InvitationCode
 
 
 class InvitationService:

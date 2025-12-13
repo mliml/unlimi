@@ -2,12 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session as DBSession
 from sqlalchemy import func
 from typing import List
-from app.db.database import get_db
+from app.services.database import get_db
 from app.core.deps import get_current_user
-from app.db.models.user import User
-from app.db.models.session import Session
-from app.db.models.user_context import UserContext
-from app.db.models.therapist import Therapist
+from app.models.user import User
+from app.models.session import Session
+from app.models.user_context import UserContext
+from app.models.therapist import Therapist
 from app.schemas.user import UserOverview, UserRead, UserUpdate
 from app.schemas.user_context import UserContextResponse
 from app.schemas.user_memory import UserMemoryItem

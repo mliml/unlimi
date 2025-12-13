@@ -6,8 +6,8 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from app.db.database import get_db
-from app.db.models.user import User
+from app.services.database import get_db
+from app.models.user import User
 from app.core.security import decode_access_token
 from app.services.user_service import UserService
 

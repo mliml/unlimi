@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
-from app.db.models.user_onboarding import QuestionType
+from app.models.user_onboarding import QuestionType
 from app.schemas.emo_score import EmoScoreResponse
 
 
