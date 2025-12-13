@@ -27,7 +27,7 @@
           <button
             @click="showLogoutModal = true"
             class="p-2 hover:bg-red-50 rounded-full transition"
-            title="退出登录"
+            title="Log Out"
           >
             <svg class="w-6 h-6 text-textSub" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -65,7 +65,7 @@
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
-              <span class="font-semibold font-serif text-white">开始咨询</span>
+              <span class="font-extrabold font-serif text-white">Start Consultation</span>
             </button>
 
             <!-- 过往咨询 -->
@@ -76,7 +76,7 @@
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
-              <span class="font-semibold font-serif text-white">过往咨询</span>
+              <span class="font-extrabold font-serif text-white">Consultation History</span>
             </button>
 
             <!-- 整体回顾 -->
@@ -87,7 +87,7 @@
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
-              <span class="font-semibold font-serif text-white">整体回顾</span>
+              <span class="font-extrabold font-serif text-white">Insights</span>
             </button>
           </div>
         </div>
@@ -131,20 +131,20 @@
       @click.self="showLogoutModal = false"
     >
       <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
-        <h3 class="text-xl font-semibold text-textMain mb-4">确认退出登录</h3>
-        <p class="text-textSub mb-6">您确定要退出当前账户吗？</p>
+        <h3 class="text-xl font-semibold font-serif text-textMain mb-4">Confirm Log Out</h3>
+        <p class="text-textSub font-serif mb-6">Are you sure you want to log out?</p>
         <div class="flex justify-end space-x-3">
           <button
             @click="showLogoutModal = false"
-            class="px-4 py-2 border border-gray-300 text-textMain rounded-lg hover:bg-gray-50 transition duration-200"
+            class="px-4 py-2 border border-gray-300 text-textMain font-serif rounded-lg hover:bg-gray-50 transition duration-200"
           >
-            取消
+            Cancel
           </button>
           <button
             @click="handleLogout"
-            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-200"
+            class="px-4 py-2 bg-red-600 text-white font-serif rounded-lg hover:bg-red-700 transition duration-200"
           >
-            退出登录
+            Log Out
           </button>
         </div>
       </div>

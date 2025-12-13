@@ -2,11 +2,11 @@
   <div class="bg-white rounded-2xl p-6 shadow-sm h-full flex flex-col">
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
-      <h3 class="font-semibold text-textMain flex items-center">
+      <h3 class="font-extrabold font-serif text-textMain flex items-center">
         <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
-        咨询日程
+        Schedule
       </h3>
     </div>
 
@@ -19,14 +19,14 @@
         :class="[
           'flex flex-col items-center p-2 rounded-xl transition-all duration-200',
           selectedDay === day.date
-            ? 'bg-accent text-textMain scale-110 shadow-md'
+            ? 'bg-tertiary text-white scale-110 shadow-md'
             : 'hover:bg-gray-100 text-textSub'
         ]"
       >
-        <span class="text-xs font-medium">{{ day.day }}</span>
+        <span class="text-xs font-medium font-serif">{{ day.day }}</span>
         <span :class="[
-          'text-lg font-bold mt-1',
-          selectedDay === day.date ? 'text-textMain' : 'text-textMain'
+          'text-lg font-bold font-serif mt-1',
+          selectedDay === day.date ? 'text-white' : 'text-textMain'
         ]">{{ day.date }}</span>
       </button>
     </div>
@@ -40,7 +40,7 @@
       >
         <!-- Activity Info -->
         <div>
-          <p class="text-sm font-medium text-textMain mb-1">
+          <p class="text-sm font-medium font-serif text-textMain mb-1">
             {{ activity.title }}
           </p>
           <div class="flex items-center text-xs text-textSub">
@@ -57,13 +57,13 @@
         <svg class="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
-        <p class="text-sm">今日暂无安排</p>
+        <p class="text-sm font-serif">No activities today</p>
       </div>
     </div>
 
     <!-- Book Next Consultation Button - 固定在底部 -->
-    <button class="w-full py-3 bg-gradient-to-r from-primary to-primary text-white rounded-xl font-medium hover:shadow-md transition-all duration-200 hover:from-primary hover:to-primary">
-      预约下次咨询
+    <button class="w-full py-3 bg-gradient-to-r from-primary to-primary text-white rounded-xl font-extrabold font-serif hover:shadow-md transition-all duration-200 hover:from-primary hover:to-primary">
+      Book Next Session
     </button>
   </div>
 </template>
@@ -87,35 +87,35 @@ const activities = {
   22: [
     {
       time: '08:00-08:10',
-      title: '早晨冥想'
+      title: 'Morning Meditation'
     },
     {
       time: '08:30-09:00',
-      title: '感恩日记'
+      title: 'Gratitude Journal'
     },
     {
       time: '10:00-10:30',
-      title: '正念练习'
+      title: 'Mindfulness Practice'
     },
     {
       time: '12:30-13:00',
-      title: '午间散步'
+      title: 'Midday Walk'
     },
     {
       time: '14:00-14:30',
-      title: '阅读时光'
+      title: 'Reading Time'
     },
     {
       time: '16:00-16:45',
-      title: '心理咨询'
+      title: 'Therapy Session'
     },
     {
       time: '17:30-18:00',
-      title: '运动锻炼'
+      title: 'Exercise'
     },
     {
       time: '19:00-19:30',
-      title: '睡前放松'
+      title: 'Bedtime Relaxation'
     }
   ]
 }

@@ -2,13 +2,13 @@
   <div class="bg-white rounded-2xl p-6 shadow-sm h-full flex flex-col">
     <!-- Header -->
     <div class="flex items-center justify-between mb-4">
-      <h3 class="font-semibold text-textMain flex items-center">
-        <svg class="w-5 h-5 mr-2 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <h3 class="font-extrabold font-serif text-textMain flex items-center">
+        <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
-        情绪指数
+        Emotional Index
       </h3>
-      <span class="text-xs text-textSub">本周数据</span>
+      <span class="text-xs font-serif text-textSub">This Week</span>
     </div>
 
     <!-- Metrics Grid -->
@@ -23,7 +23,7 @@
           v-if="!hasData"
           class="absolute inset-0 bg-gray-100 bg-opacity-80 rounded-xl flex items-center justify-center z-10"
         >
-          <span class="text-xs text-textSub font-medium">数据暂未生成</span>
+          <span class="text-xs text-textSub font-medium font-serif">No data yet</span>
         </div>
         <!-- Icon -->
         <div :class="[
@@ -87,7 +87,7 @@
 
         <!-- Metric Info -->
         <div class="text-center">
-          <p class="text-xs font-semibold text-textMain mb-1">{{ metric.name }}</p>
+          <p class="text-xs font-semibold font-serif text-textMain mb-1">{{ metric.name }}</p>
           <div class="flex items-center justify-center">
             <span :class="[
               'text-xs font-medium px-1.5 py-0.5 rounded-full',
@@ -149,10 +149,10 @@ const metrics = computed(() => {
   return [
     {
       id: 1,
-      name: '压力负荷',
+      name: 'Stress Level',
       current: data.stress_score || 0,
       target: 100,
-      unit: '分',
+      unit: '',
       color: 'blue',
       trend: getTrend(data.stress_score_change),
       changeText: formatChangeRate(data.stress_score_change),
@@ -160,10 +160,10 @@ const metrics = computed(() => {
     },
     {
       id: 2,
-      name: '情绪稳定度',
+      name: 'Emotional Stability',
       current: data.stable_score || 0,
       target: 100,
-      unit: '分',
+      unit: '',
       color: 'purple',
       trend: getTrend(data.stable_score_change),
       changeText: formatChangeRate(data.stable_score_change),
@@ -171,10 +171,10 @@ const metrics = computed(() => {
     },
     {
       id: 3,
-      name: '焦虑指数',
+      name: 'Anxiety Index',
       current: data.anxiety_score || 0,
       target: 100,
-      unit: '分',
+      unit: '',
       color: 'orange',
       trend: getTrend(data.anxiety_score_change),
       changeText: formatChangeRate(data.anxiety_score_change),
@@ -182,10 +182,10 @@ const metrics = computed(() => {
     },
     {
       id: 4,
-      name: '功能水平',
+      name: 'Functional Level',
       current: data.functional_score || 0,
       target: 100,
-      unit: '分',
+      unit: '',
       color: 'green',
       trend: getTrend(data.functional_score_change),
       changeText: formatChangeRate(data.functional_score_change),
