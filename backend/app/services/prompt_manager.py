@@ -37,10 +37,10 @@ class PromptManager:
             "description": "Clerk 会话结束提示词"
         },
         {
-            "key": "therapist-general",
-            "display_name": "Therapist General",
-            "file_path": "therapist_base_instructions.yaml",
-            "description": "治疗师通用基础指令"
+            "key": "therapist-timeout",
+            "display_name": "Therapist Timeout",
+            "file_path": "therapist_timeout.yaml",
+            "description": "治疗师超时提示词"
         }
     ]
 

@@ -512,7 +512,17 @@ def create_logging_http_client() -> httpx.Client:
 
         # 解析响应体
         try:
-            if response.content and "/chat/completions" in str(response.request.url):
+            # 检查是否是 chat/completions 请求
+            if "/chat/completions" not in str(response.request.url):
+                return
+
+            # 检查响应是否已被消费（避免流式响应错误）
+            if not response.is_stream_consumed:
+                logger.debug("Response stream not consumed yet, skipping response logging")
+                return
+
+            # 解析响应内容
+            if response.content:
                 resp_data = json.loads(response.content)
 
                 # 提取响应内容和 usage

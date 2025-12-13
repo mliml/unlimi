@@ -4,7 +4,7 @@ import apiClient from '@/shared/api/axios'
 
 /**
  * 获取所有文件型 prompts（4个）
- * 返回: onboarding, clerk, clerk_over, therapist-general
+ * 返回: onboarding, clerk, clerk_over, therapist-timeout
  */
 export const getFilePrompts = async () => {
   const response = await apiClient.get('/api/admin/prompts/files')
@@ -13,7 +13,7 @@ export const getFilePrompts = async () => {
 
 /**
  * 更新单个文件型 prompt
- * @param {string} key - prompt key (onboarding, clerk, clerk_over, therapist-general)
+ * @param {string} key - prompt key (onboarding, clerk, clerk_over, therapist-timeout)
  * @param {string} content - 新的 prompt 内容
  */
 export const updateFilePrompt = async (key, content) => {

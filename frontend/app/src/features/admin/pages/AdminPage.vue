@@ -525,8 +525,8 @@ const tabs = [
   { key: 'onboarding', label: 'Onboarding', type: 'file' },
   { key: 'clerk', label: 'Clerk', type: 'file' },
   { key: 'clerk_over', label: 'Clerk Over', type: 'file' },
-  { key: 'therapist-general', label: 'Therapist General', type: 'file' },
-  { key: 'therapist-person', label: 'Therapist Person', type: 'therapist' }
+  { key: 'therapist-person', label: 'Therapist Person', type: 'therapist' },
+  { key: 'therapist-timeout', label: 'Therapist Timeout', type: 'file' }
 ]
 
 // ============ 状态管理 ============

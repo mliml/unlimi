@@ -11,7 +11,6 @@ from app.schemas.session_action import SessionStartResponse, SessionEndResponse,
 from app.schemas.session_message import SessionMessageRequest, SessionMessageResponse, SessionMessageListItem
 from app.schemas.session import SessionDetail, SessionHistoryItem
 from app.services.session_orchestrator import SessionOrchestrator
-from app.agents.therapist_agent_service import TherapistAgentService
 import logging
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
@@ -140,10 +139,12 @@ def get_session_detail(
             logger.warning(f"Failed to count messages for session {session_id}: {e}")
 
     # Calculate should_remind for active sessions
-    from app.agents.therapist_agent_service import TherapistAgentService
+    from app.core.config import settings
     should_remind = False
     if session.status == SessionStatus.open:
-        should_remind = TherapistAgentService._check_should_remind_timeout(session, db)
+        # 简单判断：只检查时长是否超过建议值（只读，不修改状态）
+        suggested_duration = settings.SESSION_SUGGESTED_DURATION_MINUTES * 60
+        should_remind = session.active_duration_seconds > suggested_duration
 
     return SessionDetail(
         id=session.id,
@@ -222,10 +223,6 @@ def start_session(
         db.refresh(new_session)
 
         logger.info(f"Created session {new_session.id} with agno_session_id: {new_session.agno_session_id}")
-
-        # Clear therapist prompt cache to ensure latest therapist info is used
-        # This is important when user switches therapist
-        TherapistAgentService.clear_therapist_prompt_cache(current_user.id)
 
         # Auto-generate therapist's opening message
         try:
