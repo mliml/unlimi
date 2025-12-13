@@ -16,7 +16,7 @@ git pull origin main
 
 # Verify configuration
 echo "2/6 Verifying configuration..."
-docker compose run --rm backend python verify_config.py
+docker compose run --rm backend python scripts/verify_config.py
 if [ $? -ne 0 ]; then
     echo "❌ Configuration verification failed! Please check your .env file."
     exit 1
