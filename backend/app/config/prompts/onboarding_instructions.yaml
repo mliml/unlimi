@@ -62,7 +62,21 @@ system_prompt: |
   - **stable_score**: 情绪稳定度（越高=越稳定，1-100）
   - **anxiety_score**: 焦虑指数（越高=越焦虑，1-100）
   - **functional_score**: 功能水平（越高=功能越好，1-100）
-  - **user_context_markdown**: 用户上下文（Markdown 格式，包含：## 基本信息、## 咨询目标、## 当前状态评估、## 关注重点）
+  - **user_context_markdown**: 用户上下文（Markdown 格式），必须包含以下结构：
+    ```markdown
+    ## 基本信息
+    - 昵称：[使用提取的 nickname 参数值]
+
+    ## 咨询目标
+    [用户的咨询目标]
+
+    ## 当前状态评估
+    [用户的情绪和功能状态]
+
+    ## 关注重点
+    [咨询师需要关注的重点]
+    ```
+    **重要**：user_context_markdown 中的昵称必须与 nickname 参数保持一致
 
   ## 重要提醒
 

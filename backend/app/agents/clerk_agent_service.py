@@ -92,9 +92,17 @@ class ClerkAgentService:
             }
         """
         try:
-            # 1. 读取用户所有 onboarding 问答
+            # 1. 读取用户信息（获取昵称）
             from app.models.user_onboarding import UserOnboarding
+            from app.models.user import User
 
+            user = db.query(User).filter_by(id=user_id).first()
+            if not user:
+                raise ValueError("User not found")
+
+            user_nickname = user.nickname or "用户"
+
+            # 2. 读取用户所有 onboarding 问答
             questions = db.query(UserOnboarding)\
                 .filter_by(user_id=user_id)\
                 .order_by(UserOnboarding.question_number)\
@@ -103,22 +111,24 @@ class ClerkAgentService:
             if not questions:
                 raise ValueError("No onboarding questions found")
 
-            # 2. 构造问答对话历史
+            # 3. 构造问答对话历史
             qa_text = "\n\n".join([
                 f"Q{q.question_number}: {q.question_text}\nA: {q.answer or '未回答'}"
                 for q in questions
             ])
 
-            # 3. 使用 Agno Agent 分析
+            # 4. 使用 Agno Agent 分析
             prompt = f"""
 请分析以下用户的 onboarding 问答记录，生成结构化的用户上下文（Markdown 格式）。
+
+用户昵称：{user_nickname}
 
 {qa_text}
 
 要求：
 1. 使用以下 Markdown 结构：
    ## 基本信息
-   - 昵称：[从第一个问题提取]
+   - 昵称：{user_nickname}
 
    ## 咨询目标
    [用户寻求咨询的主要目的]
@@ -135,6 +145,7 @@ class ClerkAgentService:
 2. 保持简洁专业，每部分 2-5 句话
 3. 使用第三人称描述
 4. 只输出 Markdown 文本，不要有其他解释
+5. **重要**：必须使用提供的昵称 "{user_nickname}"，不要修改
 
 请立即调用 save_user_context 工具保存生成的用户上下文。
 """

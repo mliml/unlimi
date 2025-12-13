@@ -311,6 +311,29 @@ class OnboardingAgentService:
             db = SessionLocal()
 
             try:
+                # 确保 user_context_markdown 包含正确的昵称
+                # 如果 AI 没有正确包含，手动添加
+                if "## 基本信息" in user_context_markdown:
+                    # 检查是否包含昵称
+                    if f"昵称：{nickname}" not in user_context_markdown and f"昵称: {nickname}" not in user_context_markdown:
+                        # 替换占位符或添加昵称
+                        import re
+                        # 尝试替换 "昵称：xxx" 或 "昵称: xxx" 的部分
+                        user_context_markdown = re.sub(
+                            r'(昵称[：:]\s*)([^\n]+)',
+                            f'昵称：{nickname}',
+                            user_context_markdown
+                        )
+                        # 如果没有找到昵称行，在基本信息后添加
+                        if "昵称：" not in user_context_markdown and "昵称:" not in user_context_markdown:
+                            user_context_markdown = user_context_markdown.replace(
+                                "## 基本信息",
+                                f"## 基本信息\n- 昵称：{nickname}"
+                            )
+                else:
+                    # 如果没有基本信息部分，添加到开头
+                    user_context_markdown = f"## 基本信息\n- 昵称：{nickname}\n\n{user_context_markdown}"
+
                 # 1. 保存 emo_score
                 emo_score = EmoScore(
                     user_id=user_id,
