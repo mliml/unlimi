@@ -26,8 +26,8 @@ fi
 echo "3/6 Rebuilding backend Docker image..."
 docker compose build --no-cache backend
 
-# Rebuild frontend
-echo "4/6 Rebuilding frontend Docker image..."
+# Rebuild frontend (landing + app)
+echo "4/6 Rebuilding frontend Docker image (landing + app)..."
 docker compose build --no-cache frontend
 
 # Restart all services
@@ -49,8 +49,12 @@ echo "=== Backend Logs (last 15 lines) ==="
 docker compose logs backend --tail 15
 
 echo ""
+echo "=== Frontend Logs (last 10 lines) ==="
+docker compose logs frontend --tail 10
+
+echo ""
 echo "=== Deployment Complete ==="
-echo "Access your application at: http://$(curl -s ifconfig.me)"
+echo "Access your application at: https://www.unlimi.top"
 echo ""
 echo "To view real-time logs: docker compose logs -f"
 echo "To stop all services: docker compose down"
