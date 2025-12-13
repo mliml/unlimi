@@ -9,6 +9,7 @@ from agno.db.postgres import PostgresDb
 from agno.db.sqlite import SqliteDb
 from agno.models.openai import OpenAIChat
 from app.core.config import settings
+from app.core.openai_logger import create_logging_http_client, openai_logging_context
 from app.models.user_context import UserContext
 from sqlalchemy.orm import Session
 from typing import Optional, List, Dict, Tuple
@@ -54,12 +55,16 @@ class TherapistAgentService:
         # 加载基础指令模板（包含 Jinja2 语法）
         self._base_instructions_template = self._load_base_instructions()
 
+        # 创建带日志功能的 HTTP client（用于记录 admin 用户的 prompts）
+        logging_http_client = create_logging_http_client()
+
         # 创建 Therapist Agent
         self._agent = Agent(
             name="TherapistAgent",
             model=OpenAIChat(
                 id=settings.THERAPIST_MODEL,
-                api_key=settings.OPENAI_API_KEY
+                api_key=settings.OPENAI_API_KEY,
+                http_client=logging_http_client  # 使用自定义 HTTP client
             ),
             db=self.agno_db,
 
@@ -120,13 +125,18 @@ class TherapistAgentService:
             AI 回复文本
         """
         try:
-            # 1. 加载用户上下文
+            # 1. 查询用户信息（包括 is_admin）
+            from app.models.user import User
+            user = db.query(User).filter_by(id=user_id).first()
+            is_admin = user.is_admin if user else False
+
+            # 2. 加载用户上下文
             user_context = self._load_user_context(user_id, db)
 
-            # 2. 加载治疗师个性化 prompt（带缓存）
+            # 3. 加载治疗师个性化 prompt（带缓存）
             therapist_prompt = self._load_therapist_prompt(user_id, db)
 
-            # 3. 获取 session 对象并更新轮数
+            # 4. 获取 session 对象并更新轮数
             from app.models.session import Session as SessionModel
             session_obj = db.query(SessionModel).filter_by(agno_session_id=session_id).first()
 
@@ -149,7 +159,7 @@ class TherapistAgentService:
                 active_duration_minutes = 0
                 turn_count = 0
 
-            # 4. 手动渲染 base_instructions 模板（使用 Jinja2）
+            # 5. 手动渲染 base_instructions 模板（使用 Jinja2）
             from app.core.config import settings
             template_vars = {
                 "should_remind_timeout": should_remind,
@@ -167,7 +177,7 @@ class TherapistAgentService:
                 logger.error(f"Failed to render base instructions template: {e}", exc_info=True)
                 rendered_base_instructions = self._base_instructions_template  # Fallback to unrendered
 
-            # 5. 构造 session_state
+            # 6. 构造 session_state
             # 注意：Agno 会自动持久化 session_state，下次运行时会加载
             session_state = {
                 "user_context": user_context,
@@ -181,11 +191,11 @@ class TherapistAgentService:
                 "suggested_turns": settings.SESSION_SUGGESTED_TURNS,
             }
 
-            # 6. 调用 Agent
+            # 7. 调用 Agent（使用日志上下文）
             logger.info(
                 f"[THERAPIST_AGENT] user_id={user_id}, session={session_id}, "
                 f"duration={active_duration_minutes}min, turns={turn_count}, "
-                f"should_remind={should_remind}, message_length={len(message)}"
+                f"should_remind={should_remind}, is_admin={is_admin}, message_length={len(message)}"
             )
 
             # Debug: Log session_state to verify variables are passed
@@ -202,13 +212,15 @@ class TherapistAgentService:
                 snippet = rendered_base_instructions[start_idx:start_idx+400]
                 logger.info(f"[THERAPIST_AGENT_RENDERED_BASE] {snippet}")
 
-            response = self._agent.run(
-                input=message,
-                user_id=str(user_id),  # Agno 使用字符串 user_id
-                session_id=session_id,
-                session_state=session_state,  # 传递 state
-                stream=False
-            )
+            # 使用日志上下文包裹 agent 调用（仅 admin 用户会记录完整 prompt）
+            with openai_logging_context(user_id=user_id, session_id=session_id, is_admin=is_admin):
+                response = self._agent.run(
+                    input=message,
+                    user_id=str(user_id),  # Agno 使用字符串 user_id
+                    session_id=session_id,
+                    session_state=session_state,  # 传递 state
+                    stream=False
+                )
 
             # Debug: Try to log the rendered instructions
             # Agno Agent should have a way to access the rendered instructions
@@ -244,7 +256,7 @@ class TherapistAgentService:
                         snippet = content[start_idx:start_idx+600]
                         logger.info(f"[THERAPIST_AGENT_SYSTEM_SNIPPET] {snippet}")
 
-            # 7. 返回回复内容
+            # 8. 返回回复内容
             return response.content
 
         except Exception as e:
