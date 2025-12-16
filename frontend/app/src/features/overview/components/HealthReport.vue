@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-2xl p-6 shadow-sm h-full flex flex-col">
+  <div class="bg-white rounded-2xl lg:p-6 p-4 shadow-sm h-full flex flex-col">
     <!-- Header -->
     <div class="flex items-center justify-between mb-4">
       <h3 class="font-extrabold font-serif text-textMain flex items-center">

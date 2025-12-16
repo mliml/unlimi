@@ -1,66 +1,83 @@
 <template>
-  <div class="bg-white rounded-2xl p-6 shadow-sm">
+  <div class="bg-white rounded-2xl lg:p-6 p-4 shadow-sm h-full flex flex-col">
     <!-- Header -->
     <div class="flex items-center justify-between mb-4">
-      <h3 class="font-semibold text-textMain flex items-center">
+      <h3 class="font-extrabold font-serif text-textMain flex items-center">
         <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
-        新情绪指数
+        Emotional Index
       </h3>
-      <span class="text-xs text-textSub">本周数据</span>
+      <span class="text-xs font-serif text-textSub">This Week</span>
     </div>
 
-    <!-- Metrics Grid - 横向 1x4 -->
-    <div class="grid grid-cols-4 gap-4">
+    <!-- Metrics Grid -->
+    <div class="flex-1 grid grid-cols-2 gap-3">
       <div
         v-for="metric in metrics"
         :key="metric.id"
-        class="relative p-4 rounded-xl border border-gray-100 hover:border-primary transition-all duration-200 hover:shadow-md group"
+        class="relative p-3 rounded-xl border border-gray-100 hover:border-secondary transition-all duration-200 hover:shadow-md group"
       >
         <!-- Empty Data Overlay -->
         <div
           v-if="!hasData"
           class="absolute inset-0 bg-gray-100 bg-opacity-80 rounded-xl flex items-center justify-center z-10"
         >
-          <span class="text-sm text-textSub font-medium">数据暂未生成</span>
+          <span class="text-xs text-textSub font-medium font-serif">No data yet</span>
+        </div>
+        <!-- Icon -->
+        <div :class="[
+          'absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center',
+          metric.color === 'purple' ? 'bg-purple-100' :
+          metric.color === 'blue' ? 'bg-blue-100' :
+          metric.color === 'orange' ? 'bg-orange-100' :
+          'bg-green-100'
+        ]">
+          <svg class="w-3 h-3" :class="[
+            metric.color === 'purple' ? 'text-chartPurple' :
+            metric.color === 'blue' ? 'text-chartBlue' :
+            metric.color === 'orange' ? 'text-chartOrange' :
+            'text-chartGreen'
+          ]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="metric.iconPath" />
+          </svg>
         </div>
 
         <!-- Circular Progress -->
-        <div class="flex items-center justify-center mb-3">
-          <svg class="transform -rotate-90" width="80" height="80">
+        <div class="flex items-center justify-center mb-2">
+          <svg class="transform -rotate-90" width="60" height="60">
             <!-- Background circle -->
             <circle
-              cx="40"
-              cy="40"
-              r="32"
+              cx="30"
+              cy="30"
+              r="24"
               stroke="#e5e7eb"
-              stroke-width="6"
+              stroke-width="5"
               fill="none"
             />
             <!-- Progress circle -->
             <circle
-              cx="40"
-              cy="40"
-              r="32"
+              cx="30"
+              cy="30"
+              r="24"
               :stroke="getProgressColor(metric.color)"
-              stroke-width="6"
+              stroke-width="5"
               fill="none"
-              :stroke-dasharray="circumference"
-              :stroke-dashoffset="getProgressOffset(metric.current, metric.target)"
+              :stroke-dasharray="circumferenceSmall"
+              :stroke-dashoffset="getProgressOffsetSmall(metric.current, metric.target)"
               class="transition-all duration-500"
               stroke-linecap="round"
             />
             <!-- Center text -->
             <text
-              x="40"
-              y="40"
+              x="30"
+              y="30"
               text-anchor="middle"
               dy="0.3em"
               class="transform rotate-90"
-              style="transform-origin: 40px 40px"
+              style="transform-origin: 30px 30px"
               :fill="getProgressColor(metric.color)"
-              font-size="16"
+              font-size="14"
               font-weight="bold"
             >
               {{ metric.current }}
@@ -70,10 +87,10 @@
 
         <!-- Metric Info -->
         <div class="text-center">
-          <p class="text-sm font-semibold text-textMain mb-1">{{ metric.name }}</p>
-          <div class="mt-2 flex items-center justify-center">
+          <p class="text-xs font-semibold font-serif text-textMain mb-1">{{ metric.name }}</p>
+          <div class="flex items-center justify-center">
             <span :class="[
-              'text-xs font-medium px-2 py-0.5 rounded-full',
+              'text-xs font-medium px-1.5 py-0.5 rounded-full',
               metric.trend === 'up' ? 'bg-green-100 text-green-700' :
               metric.trend === 'down' ? 'bg-red-100 text-red-700' :
               'bg-gray-100 text-textSub'
@@ -94,6 +111,7 @@ import { ref, computed, onMounted } from 'vue'
 import { getLatestEmoScore } from '@/shared/api/emoScore'
 
 const circumference = 2 * Math.PI * 32
+const circumferenceSmall = 2 * Math.PI * 24
 
 // 数据状态
 const hasData = ref(false)
@@ -131,43 +149,47 @@ const metrics = computed(() => {
   return [
     {
       id: 1,
-      name: '压力负荷',
+      name: 'Stress Level',
       current: data.stress_score || 0,
       target: 100,
-      unit: '分',
+      unit: '',
       color: 'blue',
       trend: getTrend(data.stress_score_change),
-      changeText: formatChangeRate(data.stress_score_change)
+      changeText: formatChangeRate(data.stress_score_change),
+      iconPath: 'M13 10V3L4 14h7v7l9-11h-7z'
     },
     {
       id: 2,
-      name: '情绪稳定度',
+      name: 'Emotional Stability',
       current: data.stable_score || 0,
       target: 100,
-      unit: '分',
+      unit: '',
       color: 'purple',
       trend: getTrend(data.stable_score_change),
-      changeText: formatChangeRate(data.stable_score_change)
+      changeText: formatChangeRate(data.stable_score_change),
+      iconPath: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z'
     },
     {
       id: 3,
-      name: '焦虑指数',
+      name: 'Anxiety Index',
       current: data.anxiety_score || 0,
       target: 100,
-      unit: '分',
+      unit: '',
       color: 'orange',
       trend: getTrend(data.anxiety_score_change),
-      changeText: formatChangeRate(data.anxiety_score_change)
+      changeText: formatChangeRate(data.anxiety_score_change),
+      iconPath: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
     },
     {
       id: 4,
-      name: '功能水平',
+      name: 'Functional Level',
       current: data.functional_score || 0,
       target: 100,
-      unit: '分',
+      unit: '',
       color: 'green',
       trend: getTrend(data.functional_score_change),
-      changeText: formatChangeRate(data.functional_score_change)
+      changeText: formatChangeRate(data.functional_score_change),
+      iconPath: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
     }
   ]
 })
@@ -187,6 +209,12 @@ const getProgressColor = (color) => {
 const getProgressOffset = (current, target) => {
   const percentage = (current / target) * 100
   return circumference - (percentage / 100) * circumference
+}
+
+// 计算小圆圈进度偏移
+const getProgressOffsetSmall = (current, target) => {
+  const percentage = (current / target) * 100
+  return circumferenceSmall - (percentage / 100) * circumferenceSmall
 }
 
 // 加载数据

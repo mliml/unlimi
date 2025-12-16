@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-2xl p-6 shadow-sm h-full flex flex-col">
+  <div class="bg-white rounded-2xl lg:p-6 p-4 shadow-sm h-full flex flex-col">
     <!-- Header -->
     <div class="flex items-center justify-between mb-3">
       <h3 class="font-extrabold font-serif text-textMain flex items-center">
@@ -11,7 +11,7 @@
     </div>
 
     <!-- Stats Grid -->
-    <div class="flex-1 grid grid-cols-4 gap-2">
+    <div class="flex-1 grid lg:grid-cols-4 grid-cols-2 gap-2">
       <div
         v-for="stat in stats"
         :key="stat.id"

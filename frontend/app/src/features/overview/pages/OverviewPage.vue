@@ -2,10 +2,10 @@
   <div class="min-h-screen bg-bg">
     <!-- Header -->
     <div class="py-6">
-      <div class="max-w-[1400px] mx-auto px-8 flex items-center justify-between">
+      <div class="max-w-[1400px] mx-auto lg:px-8 px-4 flex items-center justify-between">
         <!-- Left: Greeting -->
         <div>
-          <h1 class="text-3xl font-bold font-serif text-textMain">
+          <h1 class="lg:text-3xl text-2xl font-bold font-serif text-textMain">
             Hello, <span class="text-primary">{{ authStore.user?.nickname || 'User' }}</span>
           </h1>
         </div>
@@ -45,22 +45,21 @@
     </div>
 
     <!-- Main Content -->
-    <div class="max-w-[1400px] mx-auto px-8 py-6">
-      <!-- Grid 容器：3行等高，每行 200px -->
+    <div class="max-w-[1400px] mx-auto lg:px-8 px-4 py-6">
+      <!-- Grid 容器：桌面端3行等高，移动端单列堆叠 -->
       <div
-        class="grid grid-cols-12 gap-6"
-        style="grid-template-rows: repeat(3, 200px);"
+        class="grid lg:grid-cols-12 grid-cols-1 lg:gap-6 gap-4 lg:grid-rows-[200px_200px_200px]"
       >
 
         <!-- ========== 左侧列 ========== -->
 
         <!-- Row 1: Action Buttons -->
-        <div class="col-span-3 row-start-1">
+        <div class="lg:col-span-3 lg:row-start-1 col-span-1 order-1 lg:order-none">
           <div class="space-y-3">
             <!-- 开始咨询 -->
             <button
               @click="$router.push('/app/consult')"
-              class="w-full bg-gradient-to-br from-primary to-primary rounded-xl p-4 shadow-sm hover:shadow-lg transition-all duration-200 group flex items-center justify-center space-x-3"
+              class="w-full bg-gradient-to-br from-primary to-primary rounded-xl lg:p-4 p-3 shadow-sm hover:shadow-lg transition-all duration-200 group flex items-center justify-center space-x-3"
             >
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
@@ -71,7 +70,7 @@
             <!-- 过往咨询 -->
             <button
               @click="$router.push('/app/history')"
-              class="w-full bg-gradient-to-br from-secondary to-secondary rounded-xl p-4 shadow-sm hover:shadow-lg transition-all duration-200 group flex items-center justify-center space-x-3"
+              class="w-full bg-gradient-to-br from-secondary to-secondary rounded-xl lg:p-4 p-3 shadow-sm hover:shadow-lg transition-all duration-200 group flex items-center justify-center space-x-3"
             >
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -82,7 +81,7 @@
             <!-- 整体回顾 -->
             <button
               @click="$router.push('/app/insights')"
-              class="w-full bg-gradient-to-br from-tertiary to-tertiary rounded-xl p-4 shadow-sm hover:shadow-lg transition-all duration-200 group flex items-center justify-center space-x-3"
+              class="w-full bg-gradient-to-br from-tertiary to-tertiary rounded-xl lg:p-4 p-3 shadow-sm hover:shadow-lg transition-all duration-200 group flex items-center justify-center space-x-3"
             >
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -93,31 +92,31 @@
         </div>
 
         <!-- Row 2-3: 咨询日程（跨2行） -->
-        <div class="col-span-3 row-start-2 row-span-2">
+        <div class="lg:col-span-3 lg:row-start-2 lg:row-span-2 col-span-1 order-5 lg:order-none">
           <WeekCalendar class="h-full" />
         </div>
 
         <!-- ========== 中间列 ========== -->
 
         <!-- Row 1-2: 情绪指数（跨2行） -->
-        <div class="col-span-6 row-start-1 row-span-2">
+        <div class="lg:col-span-6 lg:row-start-1 lg:row-span-2 col-span-1 order-3 lg:order-none">
           <HealthReport class="h-full" />
         </div>
 
         <!-- Row 3: 咨询数据 -->
-        <div class="col-span-6 row-start-3">
+        <div class="lg:col-span-6 lg:row-start-3 col-span-1 order-4 lg:order-none">
           <DailyStats class="h-full" />
         </div>
 
         <!-- ========== 右侧列 ========== -->
 
         <!-- Row 1-2: 你的咨询师（跨2行） -->
-        <div class="col-span-3 row-start-1 row-span-2">
+        <div class="lg:col-span-3 lg:row-start-1 lg:row-span-2 col-span-1 order-2 lg:order-none">
           <YourTherapist class="h-full" />
         </div>
 
         <!-- Row 3: 积极心理 Tips -->
-        <div class="col-span-3 row-start-3">
+        <div class="lg:col-span-3 lg:row-start-3 col-span-1 order-6 lg:order-none">
           <PsychologyTips class="h-full" />
         </div>
 
